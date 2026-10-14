@@ -71,3 +71,4 @@ install.sh    نصب باینری و سرویس کاربر
 بدون فریم‌ورک فرانت، npm یا فایل تست. تنها وابستگی Go: [go-sqlite3](https://github.com/mattn/go-sqlite3). رابط تیره با رنگ‌های فسفری و GIF واقعی گربهٔ تایپیست است. GIF محلی است و بدون اینترنت نمایش داده می‌شود؛ برای حالت کاهش حرکت سیستم، پیش‌نمایش ثابت نمایش داده می‌شود. منابع تصاویر در [web/GIF-SOURCES.md](web/GIF-SOURCES.md) ثبت شده‌اند.
 
 فونت محلی [Vazirmatn](https://github.com/rastikerdar/vazirmatn) با مجوز OFL در `web/FONT-LICENSE.txt` قرار دارد.
+# work-log

@@ -225,6 +225,14 @@ func main() {
 		log.Fatal(err)
 	}
 	mux.Handle("/", http.FileServer(http.FS(files)))
+	go func() {
+		ticker := time.NewTicker(time.Minute)
+		defer ticker.Stop()
+		for {
+			syncProjects(db, abs)
+			<-ticker.C
+		}
+	}()
 	address := "127.0.0.1:" + strconv.Itoa(*port)
 	server := &http.Server{Addr: address, Handler: localOnly(mux, *port), ReadHeaderTimeout: 5 * time.Second, ReadTimeout: 15 * time.Second, WriteTimeout: 120 * time.Second, IdleTimeout: 60 * time.Second}
 	fmt.Printf("Worklog 🐈  http://%s\nدیتابیس: %s\n", address, filepath.Join(abs, "worklog.db"))

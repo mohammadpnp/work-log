@@ -111,6 +111,10 @@ function reportQuery() {
   const today = new Date(`${state.today}T12:00:00Z`);
   if (period === 'today') {
     query.set('from', state.today); query.set('to', state.today);
+  } else if (period === 'yesterday') {
+    const yesterday = new Date(today);
+    yesterday.setUTCDate(yesterday.getUTCDate() - 1);
+    query.set('from', isoDate(yesterday)); query.set('to', isoDate(yesterday));
   } else if (period === 'week') {
     const start = new Date(today);
     start.setUTCDate(start.getUTCDate() - (start.getUTCDay() + 1) % 7);

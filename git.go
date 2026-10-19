@@ -8,6 +8,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -109,14 +110,44 @@ func storeGitLog(db *sql.DB, p project, data []byte, branch string) error {
 }
 
 func importHistory(db *sql.DB, p project) error {
+	return importSince(db, p, "90 days ago")
+}
+
+func importSince(db *sql.DB, p project, since string) error {
 	if _, err := gitText(p.Path, "rev-parse", "--verify", "HEAD"); err != nil {
 		return nil
 	}
-	output, err := git(p.Path, "log", "--all", "--since=90 days ago", "-z", "--format="+logFormat)
+	output, err := git(p.Path, "log", "--all", "--since="+since, "-z", "--format="+logFormat)
 	if err != nil {
 		return err
 	}
 	return storeGitLog(db, p, output, "")
+}
+
+func syncProjects(db *sql.DB, dir string) {
+	cfg, err := readHookConfig(dir)
+	if err != nil {
+		log.Print("worklog sync: ", err)
+		return
+	}
+	if !cfg.Enabled {
+		return
+	}
+	current, err := globalHooksPath()
+	if err != nil || current != filepath.Join(dir, "hooks") {
+		return
+	}
+	list, err := projects(db)
+	if err != nil {
+		log.Print("worklog sync: ", err)
+		return
+	}
+	for _, p := range list {
+		// shortcut: recover the last 24 hours; use project sync timestamps if longer offline recovery is needed.
+		if err := importSince(db, p, "24 hours ago"); err != nil {
+			log.Printf("worklog sync %s: %v", p.Name, err)
+		}
+	}
 }
 
 func discover(db *sql.DB, dir, root string) (int, []string, error) {
